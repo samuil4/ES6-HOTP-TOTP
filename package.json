@@ -1,0 +1,11 @@
+{
+  "name": "ES6-HOTP-TOTP",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/samuil4/ES6-HOTP-TOTP.git",
+  "author": "Samuil Gospodinov <samuil4@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "jssha": "^2.3.1"
+  }
+}
