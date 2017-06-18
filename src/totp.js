@@ -1,9 +1,8 @@
-import jsSHA from 'jssha';
+import JSSHA from 'jssha';
 
-export default Totp;
+class Totp {
 
-    function Totp(expiry = 30, length = 6) {
-
+    constructor(expiry = 30, length = 6) {
         this.expiry = expiry;
         this.length = length;
 
@@ -12,15 +11,39 @@ export default Totp;
         }
     }
 
-    Totp.prototype.dec2hex = function(s) {
+    getOtp (secret, now = new Date().getTime()) {
+
+        let epoch, hmac, key, offset, otp, shaObj, time;
+
+
+        key = this.base32tohex(secret);
+        epoch = Math.round(now / 1000.0);
+        time = this.leftpad(this.dec2hex(Math.floor(epoch / this.expiry)), 16, "0");
+
+        shaObj = new JSSHA("SHA-1", "HEX");
+        shaObj.setHMACKey(key, "HEX");
+        shaObj.update(time);
+        hmac = shaObj.getHMAC("HEX");
+
+        if (hmac === "KEY MUST BE IN BYTE INCREMENTS") {
+            throw "Error: hex key must be in byte increments";
+        } else {
+            offset = this.hex2dec(hmac.substring(hmac.length - 1));
+        }
+        otp = (this.hex2dec(hmac.substr(offset * 2, 8)) & this.hex2dec("7fffffff")) + "";
+        otp = otp.substr(otp.length - this.length, this.length);
+        return otp;
+    }
+
+    dec2hex (s) {
         return (s < 15.5 ? "0" : "") + Math.round(s).toString(16);
-    };
+    }
 
-    Totp.prototype.hex2dec = function(s) {
+    hex2dec (s) {
         return parseInt(s, 16);
-    };
+    }
 
-    Totp.prototype.base32tohex = function(base32) {
+    base32tohex (base32) {
 
         let base32chars, bits, chunk, hex, val;
 
@@ -47,35 +70,14 @@ export default Totp;
         }
 
         return hex;
-    };
+    }
 
-    Totp.prototype.leftpad = function(str, len, pad) {
+    leftpad (str, len, pad) {
         if (len + 1 >= str.length) {
             str = new Array(len + 1 - str.length).join(pad) + str;
         }
         return str;
-    };
+    }
+}
 
-    Totp.prototype.getOtp = function(secret, now = new Date().getTime()) {
-
-        let epoch, hmac, key, offset, otp, shaObj, time;
-
-
-        key = this.base32tohex(secret);
-        epoch = Math.round(now / 1000.0);
-        time = this.leftpad(this.dec2hex(Math.floor(epoch / this.expiry)), 16, "0");
-
-        shaObj = new jsSHA("SHA-1", "HEX");
-        shaObj.setHMACKey(key, "HEX");
-        shaObj.update(time);
-        hmac = shaObj.getHMAC("HEX");
-
-        if (hmac === "KEY MUST BE IN BYTE INCREMENTS") {
-            throw "Error: hex key must be in byte increments";
-        } else {
-            offset = this.hex2dec(hmac.substring(hmac.length - 1));
-        }
-        otp = (this.hex2dec(hmac.substr(offset * 2, 8)) & this.hex2dec("7fffffff")) + "";
-        otp = otp.substr(otp.length - this.length, this.length);
-        return otp;
-    };
+export default Totp;

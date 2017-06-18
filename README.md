@@ -42,7 +42,6 @@ Import `src/OTP.js` to your script like.
 * [Fixed] exposing methods to global scope
     
 ## TO DO
-* Switch from constructor function to plain object calls
 * Better handling of errors
 
 ## TO DO if requested
