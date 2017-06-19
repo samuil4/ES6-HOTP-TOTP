@@ -50,5 +50,6 @@ Import `src/OTP.js` to your script like.
 * Add angular 1.6+ example
 * Add angular 2 example
 * Add ng-cordova example
+* Add ampersand.js example with model usage
 * Add test
 * Add dist
